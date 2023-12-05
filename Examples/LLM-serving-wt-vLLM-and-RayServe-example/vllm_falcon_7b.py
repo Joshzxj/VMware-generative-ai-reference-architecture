@@ -134,6 +134,6 @@ def send_sample_request():
 
 # Deployment definition for Ray Serve
 deployment = VLLMPredictDeployment.bind(model="tiiuae/falcon-7b-instruct",
-                                            dtype="bfloat16",
+                                            dtype="float16",
                                             trust_remote_code=True,
                                             )
