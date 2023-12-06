@@ -136,4 +136,5 @@ def send_sample_request():
 deployment = VLLMPredictDeployment.bind(model="tiiuae/falcon-7b-instruct",
                                             dtype="float16",
                                             trust_remote_code=True,
+                                            gpu_memory_utilization=0.4
                                             )
