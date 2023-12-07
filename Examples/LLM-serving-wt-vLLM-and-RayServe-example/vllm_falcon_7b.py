@@ -133,8 +133,4 @@ def send_sample_request():
 
 
 # Deployment definition for Ray Serve
-deployment = VLLMPredictDeployment.bind(model="facebook/opt-125m",
-                                            dtype="float16",
-                                            trust_remote_code=True,
-                                            gpu_memory_utilization=0.8
-                                            )
+deployment = VLLMPredictDeployment.bind(model="google/bert_uncased_L-12_H-768_A-12", trust_remote_code=True)
