@@ -133,5 +133,4 @@ def send_sample_request():
 
 
 # Deployment definition for Ray Serve
-if __name__ == "__main__":
-    deployment = VLLMPredictDeployment.bind(model="GeneZC/MiniChat-3B", trust_remote_code=True)
+deployment = VLLMPredictDeployment.bind(model="GeneZC/MiniChat-3B", trust_remote_code=True)
