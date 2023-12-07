@@ -1,14 +1,6 @@
-"""
-Example of a vLLM prompt completion service based on the Falcon-7b LLM
-to get deployed on Ray Serve.
-
-Adapted from the AnyScale team's repository
-https://github.com/ray-project/ray/blob\
-/cc983fc3e64c1ba215e981a43dd0119c03c74ff1/doc/source/serve/doc_code/vllm_example.py
-"""
-
 import json
 from typing import AsyncGenerator
+
 from fastapi import BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import StreamingResponse, Response
@@ -16,7 +8,9 @@ from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.async_llm_engine import AsyncLLMEngine
 from vllm.sampling_params import SamplingParams
 from vllm.utils import random_uuid
+
 from ray import serve
+
 
 @serve.deployment(ray_actor_options={"num_gpus": 1})
 class VLLMPredictDeployment:
@@ -110,31 +104,23 @@ class VLLMPredictDeployment:
 
 
 def send_sample_request():
-    """
-    An example of how to send a prompt completion request to the Ray head URL.
-    The completion gets printed to the std output.
-
-    :return: None
-    """
     import requests
-    import json
 
     prompt = "How do I cook fried rice?"
-    sample_input = {"prompt": prompt,
-                    "stream": False,
-                    "max_tokens": 128,
-                    "temperature": 0,
-                    }
-    # Replace the hostname with Ray head's hostname or IP address
-    ray_url = "http://localhost:8000/"
-    output = requests.post(ray_url, json=sample_input)
+    sample_input = {"prompt": prompt, "stream": True}
+    output = requests.post("http://localhost:8000/", json=sample_input)
     for line in output.iter_lines():
-        print(json.loads(line.decode("utf-8"))['text'][0])
+        print(line.decode("utf-8"))
 
 
-# Deployment definition for Ray Serve
-deployment = VLLMPredictDeployment.bind(model="tiiuae/falcon-7b-instruct",
-                                            dtype="float16",
-                                            trust_remote_code=True,
-                                            gpu_memory_utilization=0.4
-                                            )
+if __name__ == "__main__":
+    # To run this example, you need to install vllm which requires
+    # OS: Linux
+    # Python: 3.8 or higher
+    # CUDA: 11.0 – 11.8
+    # GPU: compute capability 7.0 or higher (e.g., V100, T4, RTX20xx, A100, L4, etc.)
+    # see https://vllm.readthedocs.io/en/latest/getting_started/installation.html
+    # for more details.
+    deployment = VLLMPredictDeployment.bind(model="facebook/opt-125m")
+    serve.run(deployment)
+    send_sample_request()
