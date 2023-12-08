@@ -18,6 +18,7 @@ from vllm.sampling_params import SamplingParams
 from vllm.utils import random_uuid
 from ray import serve
 
+
 @serve.deployment(ray_actor_options={"num_gpus": 1})
 class VLLMPredictDeployment:
     def __init__(self, **kwargs):
@@ -83,7 +84,8 @@ class VLLMPredictDeployment:
         stream = request_dict.pop("stream", False)
         sampling_params = SamplingParams(**request_dict)
         request_id = random_uuid()
-        results_generator = self.engine.generate(prompt, sampling_params, request_id)
+        results_generator = self.engine.generate(
+            prompt, sampling_params, request_id)
         if stream:
             background_tasks = BackgroundTasks()
             # Using background_taks to abort the the request
@@ -104,7 +106,8 @@ class VLLMPredictDeployment:
 
         assert final_output is not None
         prompt = final_output.prompt
-        text_outputs = [prompt + output.text for output in final_output.outputs]
+        text_outputs = [
+            prompt + output.text for output in final_output.outputs]
         ret = {"text": text_outputs}
         return Response(content=json.dumps(ret))
 
@@ -133,4 +136,8 @@ def send_sample_request():
 
 
 # Deployment definition for Ray Serve
-deployment = VLLMPredictDeployment.bind(model="facebook/opt-125m")
+deployment = VLLMPredictDeployment.bind(model="facebook/opt-125m",
+                                        dtype="bfloat16",
+                                        max_model_len=4096,
+                                        gpu_memory_utilization=0.7,
+                                        trust_remote_code=True)
