@@ -138,6 +138,6 @@ def send_sample_request():
 # Deployment definition for Ray Serve
 dd = VLLMPredictDeployment.bind(model="facebook/opt-125m",
                                 dtype="bfloat16",
-                                max_model_len=4096,
+                                max_model_len=2048,
                                 gpu_memory_utilization=0.7,
                                 trust_remote_code=True)
